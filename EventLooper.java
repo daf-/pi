@@ -1,11 +1,12 @@
 import com.cycling74.max.*;
 
-import java.lang.System;
 import java.util.ArrayList;
+
 
 public class EventLooper extends com.cycling74.max.MaxObject {
     private long begin, end;  // start and end time of loop
-    private boolean recording;
+    private boolean recording,
+                    playing;
     private ArrayList<Event> buf;  // buffer of events
 
     public class Event {
@@ -23,8 +24,10 @@ public class EventLooper extends com.cycling74.max.MaxObject {
         declareOutlets(new int[]{DataTypes.ALL});
 
         buf   = new ArrayList<Event>();
-        begin = 0;
-        end   = 0;
+        recording = false;
+        playing   = false;
+        begin     = 0;
+        end       = 0;
     }
 
     /**
@@ -37,9 +40,16 @@ public class EventLooper extends com.cycling74.max.MaxObject {
         recording = true;
     }
 
+    /**
+     * If recording stop recording, otherwise stop playing.
+     */
     public void stop() {
-        end = System.nanoTime();
-        recording = false;
+        if (recording) {
+            end = System.nanoTime();
+            recording = false;
+        } else {
+            playing   = false;
+        }
     }
 
     /**
@@ -48,6 +58,7 @@ public class EventLooper extends com.cycling74.max.MaxObject {
      * else just start playing
      */
     public void play() {
+        playing = true;
         if (recording) {
             stop();
             _loop();
@@ -67,17 +78,20 @@ public class EventLooper extends com.cycling74.max.MaxObject {
     }
 
     /**
-     * Actual method to loop playback.
+     * Loops events based on their timestamp.
      */
     public void _loop() {
-        int len = buf.size();
-        Event curEvent = buf.get(0);
-        while (true) {
-            try {
-                Thread.sleep(40);
-            } catch (java.lang.InterruptedException E) {
-                post("Thread interrupted");
-                E.printStackTrace();
+        while (playing) {
+            for (Event cur : buf) {
+                try {
+                    Thread.sleep(cur.time);
+                } catch (java.lang.InterruptedException E) {
+                    post("Thread interrupted");
+                    E.printStackTrace();
+                }
+
+                // send out the current event
+                outlet(0, cur.event);
             }
         }
     }
