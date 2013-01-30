@@ -17,14 +17,14 @@
  * Why can't we use nPads in declaration of arrays?
  */
 
-int nPads = 6;  // number of drum pads to consider
-unsigned long curTime;  // the current time every iteration of loop()
-int curValue;  // the current analog value of of each piezo pad each time through loop()
-unsigned long startTimes[6];  // the most recent time a window was opened for each pad
-int maxValues[6];  // keeps the current maximum amplitude for each pad
-int threshold = 100;  // ignore all values less than the threshold
-unsigned long windowSize = 20;  // length of a window in milliseconds
-int fraction = 4; // fraction of a window we wait before reporting the velocity of a hit
+int nPads = 6;                 // number of drum pads to consider
+unsigned long curTime;         // the current time every iteration of loop()
+int curValue;                  // the current analog value of of each piezo pad each time through loop()
+unsigned long startTimes[6];   // the most recent time a window was opened for each pad
+int maxValues[6];              // keeps the current maximum amplitude for each pad
+int threshold = 100;           // ignore all values less than the threshold
+unsigned long windowSize = 20; // length of a window in milliseconds
+int fraction = 4;              // fraction of a window we wait before reporting the velocity of a hit
 
 void setup()
 {
@@ -41,7 +41,6 @@ void setup()
 
 void loop()
 {
-//  delay(5);
   for (int i=0; i<nPads; i++)
   {
     curTime = millis();
